@@ -7,10 +7,24 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class WelshPriceBotService {
-    public BigDecimal getWelshInUsd() {
+    /**
+     * Fetch the price of $WELSH in $STX from Arkadiko
+     *
+     * @return $WELSH per $STX
+     */
+    public BigDecimal getLatestWelshPerStx() {
         ArkadikoPoolResponse priceList = PriceFetcher.getWelshPerStx().body();
 
-        BigDecimal latestWelshPerStx = priceList.getLatestPrice();
+        return priceList.getLatestPrice();
+    }
+
+    /**
+     * Use this method ONLY if you fetch the value - `$WELSH per $STX` from trusted source.
+     *
+     * @param latestWelshPerStx latest $WELSH per $STX value from trusted source
+     * @return $WELSH price in USD
+     */
+    public BigDecimal getWelshInUsd(BigDecimal latestWelshPerStx) {
         BigDecimal usdPerStx = PriceFetcher.getStxPrice();
 
         return usdPerStx.divide(latestWelshPerStx, 7, RoundingMode.HALF_UP);
