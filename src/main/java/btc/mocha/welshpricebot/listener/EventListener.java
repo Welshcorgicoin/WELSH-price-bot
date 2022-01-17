@@ -12,6 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class EventListener extends ListenerAdapter {
     private final WelshPriceBotService service;
@@ -22,12 +25,19 @@ public class EventListener extends ListenerAdapter {
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        BigDecimal latestWelshPerStx = service.getLatestWelshPerStx();
-        BigDecimal welshInUsd = service.getWelshInUsd(latestWelshPerStx);
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
-        String status = "$" + welshInUsd.toPlainString();
-        event.getJDA().getPresence()
-                .setPresence(OnlineStatus.ONLINE, Activity.watching(status));
+        Runnable task = () -> {
+            BigDecimal latestWelshPerStx = service.getLatestWelshPerStx();
+            BigDecimal welshInUsd = service.getWelshInUsd(latestWelshPerStx);
+
+            String status = "$" + welshInUsd.toPlainString();
+
+            event.getJDA().getPresence()
+                    .setPresence(OnlineStatus.ONLINE, Activity.watching(status));
+        };
+
+        executor.scheduleWithFixedDelay(task, 0, 15, TimeUnit.MINUTES);
     }
 
     @Override
