@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -39,6 +40,7 @@ public class EventListener extends ListenerAdapter {
             // Start building message here...
             EmbedBuilder eb = new EmbedBuilder();
 
+            eb.setColor(new Color(224, 133, 57));
             eb.addField("1 $WELSH",
                     "$" + welshInUsd.toPlainString() + "\n" +
                     latestStxPerWelsh.toPlainString() + " $STX" + "\n",
@@ -50,7 +52,6 @@ public class EventListener extends ListenerAdapter {
                     false
             );
 
-            eb.addBlankField(false);
             eb.setDescription("You check realtime price and swap at [Arkadiko](https://app.arkadiko.finance/)!");
             // end
 
