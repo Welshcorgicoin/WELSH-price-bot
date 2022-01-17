@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group = 'btc.mocha'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+
+dependencies {
+    implementation "net.dv8tion:JDA:${jdaVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.github.Philipinho:CoinGecko-Java:${coingeckoSDKVersion}"
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+}
+
+test {
+    useJUnitPlatform()
+}
