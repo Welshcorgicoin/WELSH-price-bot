@@ -1,10 +1,19 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java'
 }
 
 group = 'btc.mocha'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'btc.mocha.welshpricebot.WelshPriceBot'
+        )
+    }
+}
 
 repositories {
     mavenCentral()
@@ -17,10 +26,10 @@ dependencies {
     implementation "net.dv8tion:JDA:${jdaVersion}"
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.github.Philipinho:CoinGecko-Java:${coingeckoSDKVersion}"
+    implementation "ch.qos.logback:logback-classic:1.2.10"
 
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
 }
 
 test {
