@@ -1,6 +1,9 @@
 package btc.mocha.welshpricebot.service;
 
+import btc.mocha.welshpricebot.dto.HappyWelshDto;
 import btc.mocha.welshpricebot.response.ArkadikoPoolResponse;
+import btc.mocha.welshpricebot.response.StacksPunksApiResponse;
+import btc.mocha.welshpricebot.util.FPFetcher;
 import btc.mocha.welshpricebot.util.PriceFetcher;
 
 import java.math.BigDecimal;
@@ -28,5 +31,11 @@ public class WelshPriceBotService {
         BigDecimal usdPerStx = PriceFetcher.getStxPrice();
 
         return usdPerStx.divide(latestWelshPerStx, 7, RoundingMode.HALF_UP);
+    }
+
+    public HappyWelshDto getHappyWelshNFTData() {
+        StacksPunksApiResponse response = FPFetcher.getHappyWelshFloorPrice().body();
+
+        return HappyWelshDto.fromResponse(response);
     }
 }
