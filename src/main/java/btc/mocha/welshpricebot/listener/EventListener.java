@@ -5,6 +5,7 @@ import btc.mocha.welshpricebot.service.WelshPriceBotService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Channel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -76,7 +77,7 @@ public class EventListener extends ListenerAdapter {
                 event.getChannel().sendMessage(" ").setEmbeds(eb.build())
                         .queue();
             } else {
-                event.getChannel().sendMessage("You cannot use this command at this channel.").queue();
+                sendWrongChannelMessage(event, PRICE_CHANNEL_ID);
             }
         } else if ("!nft".equals(command)) {
             if (channelId.equals(NFT_CHANNEL_ID)) {
@@ -104,8 +105,23 @@ public class EventListener extends ListenerAdapter {
                 event.getChannel().sendMessage(" ").setEmbeds(eb.build())
                         .queue();
             } else {
-                event.getChannel().sendMessage("You cannot use this command at this channel.").queue();
+                sendWrongChannelMessage(event, NFT_CHANNEL_ID);
             }
+        }
+    }
+
+    private void sendWrongChannelMessage(@NotNull MessageReceivedEvent event, Long priceChannelId) {
+        Channel priceChannel = event.getGuild().getTextChannelById(priceChannelId);
+        if (priceChannel != null) {
+            String mention = priceChannel.getAsMention();
+
+            event.getChannel().sendMessage("You cannot use this command at this channel. Try in " + mention).queue();
+
+        } else {
+            System.err.println("Channel with id: " + NFT_CHANNEL_ID + " does not exist on guild.");
+
+            event.getChannel().sendMessage("You cannot use this command at this channel. Try in correct channel.")
+                    .queue();
         }
     }
 }
