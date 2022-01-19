@@ -18,6 +18,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class EventListener extends ListenerAdapter {
+    private static final Long PRICE_CHANNEL_ID = Long.parseLong(System.getenv("PRICE_CHANNEL_ID"));
+    private static final Long NFT_CHANNEL_ID = Long.parseLong(System.getenv("NFT_CHANNEL_ID"));
+
     private final WelshPriceBotService service;
 
     public EventListener() {
@@ -43,57 +46,66 @@ public class EventListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        Long channelId = event.getChannel().getIdLong();
         String command = event.getMessage().getContentRaw();
 
         if ("!price".equals(command)) {
-            BigDecimal latestWelshPerStx = service.getLatestWelshPerStx().setScale(3, RoundingMode.HALF_UP);
-            BigDecimal latestStxPerWelsh = BigDecimal.ONE.divide(latestWelshPerStx, 7, RoundingMode.HALF_UP);
-            BigDecimal welshInUsd = service.getWelshInUsd(latestWelshPerStx);
+            if (channelId.equals(PRICE_CHANNEL_ID)) {
+                BigDecimal latestWelshPerStx = service.getLatestWelshPerStx().setScale(3, RoundingMode.HALF_UP);
+                BigDecimal latestStxPerWelsh = BigDecimal.ONE.divide(latestWelshPerStx, 7, RoundingMode.HALF_UP);
+                BigDecimal welshInUsd = service.getWelshInUsd(latestWelshPerStx);
 
-            // Start building message here...
-            EmbedBuilder eb = new EmbedBuilder();
+                // Start building message here...
+                EmbedBuilder eb = new EmbedBuilder();
 
-            eb.setColor(new Color(224, 133, 57));
-            eb.addField("1 $WELSH",
-                    "$" + welshInUsd.toPlainString() + "\n" +
-                    latestStxPerWelsh.toPlainString() + " $STX" + "\n",
-                    false);
+                eb.setColor(new Color(224, 133, 57));
+                eb.addField("1 $WELSH",
+                        "$" + welshInUsd.toPlainString() + "\n" +
+                                latestStxPerWelsh.toPlainString() + " $STX" + "\n",
+                        false);
 
-            eb.addField(
-                    "You can buy with 1 $STX:",
-                    latestWelshPerStx.toPlainString() + " $WELSH",
-                    false
-            );
+                eb.addField(
+                        "You can buy with 1 $STX:",
+                        latestWelshPerStx.toPlainString() + " $WELSH",
+                        false
+                );
 
-            eb.setDescription("You check realtime price and swap at [Arkadiko](https://app.arkadiko.finance/)!");
-            // end
+                eb.setDescription("You check realtime price and swap at [Arkadiko](https://app.arkadiko.finance/)!");
+                // end
 
-            event.getChannel().sendMessage(" ").setEmbeds(eb.build())
-                    .queue();
+                event.getChannel().sendMessage(" ").setEmbeds(eb.build())
+                        .queue();
+            } else {
+                event.getChannel().sendMessage("You cannot use this command at this channel.").queue();
+            }
         } else if ("!nft".equals(command)) {
-            event.getChannel().sendTyping().queue();
-            HappyWelshDto dto = service.getHappyWelshNFTData();
+            if (channelId.equals(NFT_CHANNEL_ID)) {
+                event.getChannel().sendTyping().queue();
+                HappyWelshDto dto = service.getHappyWelshNFTData();
 
-            // Start building message here...
-            EmbedBuilder eb = new EmbedBuilder();
+                // Start building message here...
+                EmbedBuilder eb = new EmbedBuilder();
 
-            eb.setDescription(
-                    "Get your own Happy Welsh! You can find Happy Welsh NFTs at \n" +
-                            "- [Stacks Art](https://www.stacksart.com/collections/happy-welsh/market)\n" +
-                            "- [stxnft](https://stxnft.com/collections/SPJW1XE278YMCEYMXB8ZFGJMH8ZVAAEDP2S2PJYG.happy-welsh)"
-            );
+                eb.setDescription(
+                        "Get your own Happy Welsh! You can find Happy Welsh NFTs at \n" +
+                                "- [Stacks Art](https://www.stacksart.com/collections/happy-welsh/market)\n" +
+                                "- [stxnft](https://stxnft.com/collections/SPJW1XE278YMCEYMXB8ZFGJMH8ZVAAEDP2S2PJYG.happy-welsh)"
+                );
 
-            eb.setColor(new Color(224, 133, 57));
-            eb.addField("Total items", dto.getNumberOfItems().toString(), false);
-            eb.addField("Owners", dto.getNumberOfOwners().toString(), false);
-            eb.addField("Floor price", dto.getFloorPrice().toPlainString() + " STX", false);
-            eb.addField("All-time volume traded", dto.getAllTimeVolumeTraded().toPlainString() + " STX", false);
+                eb.setColor(new Color(224, 133, 57));
+                eb.addField("Total items", dto.getNumberOfItems().toString(), false);
+                eb.addField("Owners", dto.getNumberOfOwners().toString(), false);
+                eb.addField("Floor price", dto.getFloorPrice().toPlainString() + " STX", false);
+                eb.addField("All-time volume traded", dto.getAllTimeVolumeTraded().toPlainString() + " STX", false);
 
-            eb.setFooter("This information is fetched from Stacks Art, and information may slightly vary from site to site.");
-            // end
+                eb.setFooter("This information is fetched from Stacks Art, and information may slightly vary from site to site.");
+                // end
 
-            event.getChannel().sendMessage(" ").setEmbeds(eb.build())
-                    .queue();
+                event.getChannel().sendMessage(" ").setEmbeds(eb.build())
+                        .queue();
+            } else {
+                event.getChannel().sendMessage("You cannot use this command at this channel.").queue();
+            }
         }
     }
 }
